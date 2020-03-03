@@ -121,6 +121,7 @@ def ec2_view(id):
 
 @webapp.route('/ec2_examples/create',methods=['POST'])
 # Start a new EC2 instance
+# Create a EC2 instance
 def ec2_create():
 
     ec2 = boto3.resource('ec2')
