@@ -10,21 +10,21 @@ class WorkerManagementService:
 
     def create_new_instance(self):
         response = self.EC2.run_instances(
-            ImageId=app.config["AMI_ID"],
-            Placement={'AvailabilityZone': app.config["ZONE"]},
+            ImageId=app.config.Config.ami_id,
+            Placement={'AvailabilityZone': app.config.Config.zone},
             InstanceType='t2.small',
             MinCount=1,
             MaxCount=1,
-            KeyName=app.config["key_name"],
-            SubnetId=app.config["subnet_id"],
-            SecurityGroupIds=app.config["security_group"],
+            KeyName=app.config.Config.key_name,
+            SubnetId=app.config.Config.subnet_id,
+            SecurityGroupIds=app.config.Config.security_group,
             TagSpecifications=[
                 {
                     'ResourceType': 'instance',
                     'Tags': [
                         {
                             'Key': 'Name',
-                            'Value': app.config["ec2_name"]
+                            'Value': app.config.Config.ec2_name
                         },
                     ]
                 },
@@ -35,12 +35,12 @@ class WorkerManagementService:
         return response['Instances'][0]['InstanceId']
 
     def get_stopped_instances(self):
-        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config["ec2_name"]]},
+        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config.Config.ec2_name},
                       {'Name': 'instance-state-name', 'Values': ['stopped']}]
         return self.EC2.describe_instances(Filters=ec2_filter)
 
     def get_running_instances(self):
-        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config["ec2_name"]]},
+        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config.Config.ec2_name]},
                       {'Name': 'instance-state-name', 'Values': ['running']}]
         return self.EC2.describe_instances(Filters=ec2_filter)
 
