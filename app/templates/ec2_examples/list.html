@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <form action="{{url_for('ec2_create')}}" method="post">
-        <input type="submit" value="New">
+    <form action="{{url_for('worker_grow')}}" method="post">
+        <input type="submit" value="Grow">
+    </form>
+     <form action="{{url_for('worker_shrink')}}" method="post">
+        <input type="submit" value="Shrink">
     </form>
 
     <table />
