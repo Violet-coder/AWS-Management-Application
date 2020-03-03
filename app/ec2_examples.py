@@ -125,7 +125,7 @@ def ec2_create():
 
     ec2 = boto3.resource('ec2')
 
-    ec2.create_instances(ImageId=config.ami_id, MinCount=1, MaxCount=1)
+    ec2.create_instances(ImageId=config.ami_id, InstanceType='t2.micro',MinCount=1, MaxCount=1)
 
     return redirect(url_for('ec2_list'))
 
