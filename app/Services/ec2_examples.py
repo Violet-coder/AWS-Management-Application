@@ -1,7 +1,5 @@
 from flask import render_template, redirect, url_for, request
 from app import webapp
-import boto3
-from app import config
 from datetime import datetime, timedelta
 from operator import itemgetter
 from app.Services.WorkerManagementService import *

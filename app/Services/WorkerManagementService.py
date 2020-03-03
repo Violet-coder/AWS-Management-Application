@@ -1,12 +1,6 @@
 import time
 import boto3
-import pymysql
-from flask import current_app
 import app.config
-from flask_wtf import FlaskForm
-from wtforms import SubmitField, IntegerField, FloatField
-from wtforms.validators import NumberRange, DataRequired
-from webapp.repository import workerManagementRepo
 
 
 class WorkerManagementService:
