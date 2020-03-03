@@ -35,7 +35,7 @@ class WorkerManagementService:
         return response['Instances'][0]['InstanceId']
 
     def get_stopped_instances(self):
-        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config.Config.ec2_name},
+        ec2_filter = [{'Name': 'tag:Name', 'Values': [app.config.Config.ec2_name]},
                       {'Name': 'instance-state-name', 'Values': ['stopped']}]
         return self.EC2.describe_instances(Filters=ec2_filter)
 
