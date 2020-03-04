@@ -14,7 +14,6 @@ class WorkerManagementService:
             Placement={'AvailabilityZone': app.config.Config.zone},
             InstanceType='t2.small',
             MinCount=1,
-            MaxCount=1,
             KeyName=app.config.Config.key_name,
             SubnetId=app.config.Config.subnet_id,
             SecurityGroupIds=app.config.Config.security_group,
@@ -29,6 +28,7 @@ class WorkerManagementService:
                     ]
                 },
             ],
+            MaxCount=1,
         )
         for instance in response['Instances']:
             print(instance['InstanceId'] + " created!")
