@@ -1,6 +1,6 @@
 # ami_id = 'ami-a076eec9'
 class Config(object):
-    ami_id = 'ami-016a0c6ce4f0d6854git'
+    ami_id = 'ami-016a0c6ce4f0d6854'
     zone = 'us-east-1a'
     key_name = 'ece1779_a1'
     security_group = ['sg-02c66fa2f82dba589']
