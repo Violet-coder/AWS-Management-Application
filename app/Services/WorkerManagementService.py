@@ -52,7 +52,7 @@ class WorkerManagementService:
             self.start_instance(new_instance_id)
         else:  # create a new instance
             new_instance_id = self.create_new_instance()
-            status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
+        status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
         while len(status['InstanceStatuses']) < 1:
             time.sleep(1)
             status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
