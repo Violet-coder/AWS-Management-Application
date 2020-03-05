@@ -9,11 +9,13 @@ class WorkerManagementService:
     S3 = boto3.client('s3')
 
     def create_new_instance(self):
-        response = self.EC2.run_instances(
+        ec22 = boto3.resource("ec2")
+        response = ec22.create_instances(
             ImageId=app.config.Config.ami_id,
             Placement={'AvailabilityZone': app.config.Config.zone},
             InstanceType='t2.small',
             MinCount=1,
+            MaxCount=1,
             KeyName=app.config.Config.key_name,
             SubnetId=app.config.Config.subnet_id,
             SecurityGroupIds=app.config.Config.security_group,
@@ -28,7 +30,6 @@ class WorkerManagementService:
                     ]
                 },
             ],
-            MaxCount=1,
         )
         for instance in response['Instances']:
             print(instance['InstanceId'] + " created!")
