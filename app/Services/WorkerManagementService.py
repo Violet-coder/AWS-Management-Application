@@ -9,8 +9,7 @@ class WorkerManagementService:
     S3 = boto3.client('s3')
 
     def create_new_instance(self):
-        ec22 = boto3.resource("ec2")
-        response = ec22.create_instances(
+        response = self.EC2.run_instances(
             ImageId=app.config.Config.ami_id,
             Placement={'AvailabilityZone': app.config.Config.zone},
             InstanceType='t2.small',
