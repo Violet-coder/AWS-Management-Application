@@ -85,7 +85,7 @@ class EC2_Services:
         return [error, '']
 
     def shrink_one_worker(self):
-        target_instance_id = self.get_available_target()['Reservations']
+        target_instance_id = self.get_available_target()
         running_instances = target_instance_id
         error = False
         if len(running_instances) < 1:
