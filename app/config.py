@@ -6,5 +6,5 @@ class Config(object):
     security_group = ['sg-041902e4d97796241']
     subnet_id = 'subnet-3d00e762'
     ec2_name = 'ece1779_a2_new'
-    targetgroup_ARN = "arn:aws:elasticloadbalancing:us-east-1:027297473206:loadbalancer/app/loadbalancer1/05af72b04f53de13"
+    targetgroup_ARN = "arn:aws:elasticloadbalancing:us-east-1:027297473206:targetgroup/ece1779tg/41ab005ed602520b"
 
