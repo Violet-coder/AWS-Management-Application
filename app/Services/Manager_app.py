@@ -111,7 +111,7 @@ def ec2_view(id):
 # Start a new EC2 instance
 # Create a EC2 instance
 def worker_grow():
-    worker_management = WorkerManagementService()
+    worker_management = EC2_Services()
     [error, message] = worker_management.grow_one_worker()
     if error:
         return redirect(url_for('ec2_list'), error=message)
