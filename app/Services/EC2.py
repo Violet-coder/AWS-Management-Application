@@ -92,8 +92,8 @@ class EC2_Services:
             error = True
             return [error, 'No more worker to shrink!']
         else:
-            # self.deregister_target(target_instance_id[0])
-            self.stop_instance(running_instances[0]['Instances'][0]['InstanceId'])
+            self.deregister_target(running_instances[0])
+            self.stop_instance(running_instances[0])
             return [error, '']
 
     def start_instance(self, instance_id):
