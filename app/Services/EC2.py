@@ -3,10 +3,31 @@ import boto3
 import app.config
 
 
-class WorkerManagementService:
+class EC2_Services:
     EC2 = boto3.client('ec2')
     ELB = boto3.client('elbv2')
     S3 = boto3.client('s3')
+
+    def target_register(self, instance_id):
+        self.ELB.register_targets(
+            TargetGroupArn=app.config.Config.targetgroup_ARN,
+            Targets=[{'Id': instance_id,'Port': 5000}]
+        )
+    def target_derigister(self, instance_id):
+        self.ELB.deregister_targets(
+            TargetGroupArn=app.config.Config.targetgroup_ARN,
+            Targets=[{'Id': instance_id, 'Port': 5000}]
+        )
+
+    def get_available_target(self):
+        available_instances_id = []
+        target_group = self.ELB.describe_target_health(TargetGroupArn=app.config.Config.targetgroup_ARN)
+        if target_group['TargetHealthDescriptions']:
+            for target in target_group['TargetHealthDescriptions']:
+                if target['TargetHealth']['State'] != 'draining':
+                    available_instances_id.append(target['Target']['Id'])
+        return available_instances_id
+
 
     def create_new_instance(self):
         response = self.EC2.run_instances(
@@ -45,6 +66,7 @@ class WorkerManagementService:
         return self.EC2.describe_instances(Filters=ec2_filter)
 
     def grow_one_worker(self):
+        target_instance_id = self.get_available_target()
         error = False
         stopped_instances = self.get_stopped_instances()['Reservations']
         if stopped_instances:
@@ -59,11 +81,12 @@ class WorkerManagementService:
         while status['InstanceStatuses'][0]['InstanceState']['Name'] != 'running':
             time.sleep(1)
             status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
-
+        self.target_register(new_instance_id)
         return [error, '']
 
     def shrink_one_worker(self):
-        running_instances = self.get_running_instances()['Reservations']
+        target_instance_id = self.get_available_target()['Reservations']
+        running_instances = target_instance_id
         error = False
         if len(running_instances) < 1:
             error = True
