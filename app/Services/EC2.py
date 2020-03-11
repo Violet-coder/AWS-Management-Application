@@ -36,6 +36,7 @@ class EC2_Services:
             InstanceType='t2.small',
             MinCount=1,
             MaxCount=1,
+            Monitoring = {'Enabled':True},
             KeyName=app.config.Config.key_name,
             SubnetId=app.config.Config.subnet_id,
             SecurityGroupIds=app.config.Config.security_group,

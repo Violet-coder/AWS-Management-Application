@@ -3,7 +3,7 @@ from app import webapp
 from datetime import datetime, timedelta
 from operator import itemgetter
 from app.Services.EC2 import *
-
+from app.Services.Autoscaling import Autoscaling_Services
 
 @webapp.route('/ec2_examples', methods=['GET'])
 # Display an HTML list of all ec2 instances
@@ -114,7 +114,7 @@ def worker_grow():
     worker_management = EC2_Services()
     [error, message] = worker_management.grow_one_worker()
     if error:
-        return redirect(url_for('ec2_list'), error=message)
+        return redirect(url_for('ec2_list'))
     else:
         return redirect(url_for('ec2_list'))
 
@@ -124,7 +124,7 @@ def worker_shrink():
     worker_management = EC2_Services()
     [error, message] = worker_management.shrink_one_worker()
     if error:
-        return redirect(url_for('ec2_list'), error=message)
+        return redirect(url_for('ec2_list'))
     else:
         return redirect(url_for('ec2_list'))
 
@@ -136,6 +136,13 @@ def ec2_destroy(id):
     ec2 = boto3.resource('ec2')
     ec2.instances.filter(InstanceIds=[id]).terminate()
 
+    return redirect(url_for('ec2_list'))
+
+# Activate the autoscaling services(temporarily)
+@webapp.route('/ec2_examples/autoscaling', methods=['POST'])
+def autoscaling():
+    worker_management = Autoscaling_Services()
+    worker_management.auto_scaling()
     return redirect(url_for('ec2_list'))
 
 @webapp.route('/s3_examples',methods=['GET'])
