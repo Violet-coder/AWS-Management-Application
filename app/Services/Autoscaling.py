@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 import math
 import time
 import logging
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-import pymysql
-import json
+#import pymysql
+#import json
 
 config = app.config.Config
 engine = create_engine('mysql+pymysql://ece1779db:ece1779db@ece1779db.cj2g85prhcmw.us-east-1.rds.amazonaws.com/1779dbA2')
