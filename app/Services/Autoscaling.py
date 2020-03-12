@@ -20,6 +20,7 @@ class Autoscaling_Services:
     cloud_watch = boto3.client("cloudwatch")
 
     def auto_scaling_policy(self):
+        ''''
         db = engine.connect()
         metadata = MetaData(db)
         table = Table('autoscaling', metadata, autoload=True)
@@ -27,19 +28,19 @@ class Autoscaling_Services:
         cur = db.execute(s)
         item = cur.fetchone()
         parameters = item
-        if len(item) < 1:
+        if item is None:
             i = table.insert()
             db.execute(i,threshold_growing="80", threshold_shrinking = "20", ratio_growing = "2", ratio_shrinking = "2" )
             db.close()
             #parameters = (80, 20, 2.00, 2.00)
         else:
-         parameters = (1, 80, 20, 2.00, 2.00)
+        '''
+        parameters = (1, 80, 20, 2.00, 2.00)
         return parameters
 
     def get_using_target(self):
-        ELB = boto3.client('elbv2')
         available_instances_id = []
-        target_group = ELB.describe_target_health(TargetGroupArn=config.targetgroup_ARN)
+        target_group = self.ELB.describe_target_health(TargetGroupArn=config.targetgroup_ARN)
         if target_group['TargetHealthDescriptions']:
             for target in target_group['TargetHealthDescriptions']:
                 if target['TargetHealth']['State'] != 'unhealthy':
@@ -50,15 +51,17 @@ class Autoscaling_Services:
     def get_cpu_utility(self):
         #valid_targets = self.ELB.describe_target_health(TargetGroupArn=config.targetgroup_ARN)["TargetHealthDescriptions"]
         valid_targets_id = self.get_using_target()
+        #print(valid_targets_id)
         cpu_sum = 0
         cpu_count = 0
         #id = []
         lasttime = 0
         #valid_targets = self.get_using_target()
         #l = len(valid_instances)
-        for instance_id in valid_targets_id:
+        for target in valid_targets_id:
+            instance_id = target
             #instance_id = target['Target']['Id']
-            print(instance_id)
+            #print(instance_id)
             #id.append(instance_id)
             response = self.cloud_watch.get_metric_statistics(
                 Namespace = "AWS/EC2",
@@ -74,6 +77,7 @@ class Autoscaling_Services:
                 EndTime=datetime.utcnow()- timedelta(seconds=0 * 60),
                 Period= 60,  #Data points with a period of 60 seconds (1-minute) are available for 15 days.
             )
+            #print(response)
             try:
                 lasttime = response["Datapoints"][0]["Timestamp"]
                 cpu_sum += response["Datapoints"][0]["Average"]
@@ -91,59 +95,76 @@ class Autoscaling_Services:
         threshold_shrinking = policy[2]
         ratio_growing = policy[3]
         ratio_shrinking = policy[4]
+        print(threshold_shrinking)
         current_time = datetime.now()
         instance_amount, cpu_utils, lasttime = self.get_cpu_utility()
 
-        logging.INFO("=================auto_scaling=================")
-        logging.INFO("Time is {}".format(lasttime))
-        logging.INFO(cpu_utils)
+
+        #logging.INFO("=================auto_scaling=================")
+        #logging.INFO("Time is {}".format(lasttime))
+        #logging.INFO("cpu_utils")
         print("instance_amount",instance_amount)
         print("cpu_utils",cpu_utils)
         #print("lasttime", lasttime)
         # if there is no valid instances, then do nothing.
         if instance_amount == -1:
-            logging.warning('{} no workers in the pool'.format(current_time))
+            pass
+        #logging.warning('{} no workers in the pool'.format(current_time))
         # cpu_grow, cpu_shrink, ratio_expand, ratio_shrink
         if cpu_utils > threshold_growing:
             response = self.grow_worker_by_ratio(threshold_growing,ratio_growing)
-            logging.warning('{} grow workers: {}'.format(current_time, response))
-        elif cpu_utils < ratio_shrinking:
+            #logging.warning('{} grow workers: {}'.format(current_time, response))
+            print('in grow function')
+            print(response)
+        elif cpu_utils < threshold_shrinking:
+            print('111112')
             response = self.shrink_worker_by_ratio(threshold_shrinking,ratio_shrinking)
-            logging.warning('{} shrink workers: {}'.format(current_time, response))
+            print('in shrink function')
+            print(response)
+            #logging.warning('{} shrink workers: {}'.format(current_time, response))
         else:
             logging.warning('{} nothing to change'.format(current_time))
 
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
         instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+
         instance_list = []
+        worker_management = EC2_Services()
         if current_cpu_util > threshold_growing:
             if instance_amount < 10:
                 instance_needs_to_start = math.floor(instance_amount * ratio_growing - instance_amount)
+                temp_num_of_instances=instance_amount+ instance_needs_to_start
+                if (temp_num_of_instances > 10):
+                    instance_needs_to_start=instance_needs_to_start-(temp_num_of_instances - 10)
+
+                print('instance_needs_to_start:',instance_needs_to_start)
                 error = False
-                stopped_instances = EC2_Services.get_stopped_instances()['Reservations']
+                stopped_instances = worker_management.get_stopped_instances()['Reservations']
                 if stopped_instances:
                     if len(stopped_instances) < instance_needs_to_start :
                         for i in range(len(stopped_instances)):  # restart all stopped instances
                             # need to check stopped_instances type! original:new_instance_id = stopped_instances[0]['Instances'][0]['InstanceId']
                             new_instance_id = stopped_instances[0]['Instances'][i]['InstanceId']
                             instance_list.append(new_instance_id)
-                            EC2_Services.start_instance(new_instance_id)
+                            worker_management.start_instance(new_instance_id)
                             instance_needs_to_start = instance_needs_to_start - len(stopped_instances)
                     else:
                         for i in range(instance_needs_to_start):
                             new_instance_id = stopped_instances[0]['Instances'][i]['InstanceId']
                             instance_list.append(new_instance_id)
-                            EC2_Services.start_instance(new_instance_id)
+                            worker_management.start_instance(new_instance_id)
                             instance_needs_to_start = 0
                             # return [error, ''] # not sure, need to check this return
 
                 # create new instances
                 if instance_needs_to_start > 0:
                     for i in range(instance_needs_to_start):
-                        new_instance_id = stopped_instances[0]['Instances'][i]['InstanceId']
+                        new_instance_id = worker_management.create_new_instance()
                         instance_list.append(new_instance_id)
-                        EC2_Services.start_instance(new_instance_id)
+
+
+
         all_run = False
         while (all_run == False):
             for i in range(len(instance_list)):
@@ -161,15 +182,17 @@ class Autoscaling_Services:
 
         for i in range(len(instance_list)):
             temp_id = instance_list[i]
-            EC2_Services.target_register(temp_id)
+            worker_management.target_register(temp_id)
 
         return instance_list
 
     def shrink_worker_by_ratio(self, threshold_shrinking, ratio_shrinking):
         instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
         current_amount = instance_amount
-        target_instance_id = EC2_Services.get_available_target()
+        worker_management = EC2_Services()
+        target_instance_id = worker_management.get_available_target()
         running_instances = target_instance_id
+        print(running_instances)
         instance_list=[]
         if current_cpu_util < threshold_shrinking:
             if instance_amount > 1:
@@ -178,8 +201,8 @@ class Autoscaling_Services:
                 for i in range(instance_needs_to_stop):
                     if (current_amount < 2):
                         break
-                    EC2_Services.target_derigister(running_instances[i])
-                    EC2_Services.stop_instance(running_instances[i])
+                    worker_management.target_derigister(running_instances[i])
+                    worker_management.stop_instance(running_instances[i])
                     current_amount = current_amount - 1
                     instance_list.append(running_instances[i])
 

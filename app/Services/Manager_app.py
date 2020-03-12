@@ -145,6 +145,14 @@ def autoscaling():
     worker_management.auto_scaling()
     return redirect(url_for('ec2_list'))
 
+
+
+@webapp.route('/ec2_examples/delete_app_data', methods=['POST'])
+def delete_app_data():
+    worker_management = EC2_Services( )
+    worker_management.delete_app_data_rds()
+    return redirect(url_for('ec2_list'))
+
 @webapp.route('/s3_examples',methods=['GET'])
 # Display an HTML list of all s3 buckets.
 def s3_list():
