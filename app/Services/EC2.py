@@ -14,14 +14,15 @@ class EC2_Services:
     ELB = boto3.client('elbv2')
     S3 = boto3.client('s3')
 
-
+    """git
     def worker_list_chart(self):
         running_instances = self.get_running_instances()
         stopped_instances = self.get_stopped_instances()['Reservations']
         current_instances = len(running_instances) + len(stopped_instances)
         self.workers_list.append(current_instances)
+    """
 
-    def
+
 
     def target_register(self, instance_id):
         self.ELB.register_targets(
