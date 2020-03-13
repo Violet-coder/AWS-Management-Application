@@ -52,6 +52,10 @@ class EC2_Services:
             ImageId=config.ami_id,
             Placement={'AvailabilityZone': config.zone},
             InstanceType='t2.small',
+            IamInstanceProfile={
+                #'Arn':config.targetgroup_ARN
+                'Name':config.rolename
+            },
             MinCount=1,
             MaxCount=1,
             #Userdata=config.userdata,
@@ -123,7 +127,17 @@ class EC2_Services:
         self.EC2.stop_instances(InstanceIds=[instance_id], Hibernate=False, Force=False)
 
     def terminate_instance(self, instance_id):
-        self.EC2.terminate_instances(InstanceIds=[instance_id], Hibernate=False, Force=False)
+        self.EC2.terminate_instances(InstanceIds=[instance_id])
+
+    def terminate_all_instance(self):
+        ins = self.EC2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [config.ec2_name]}])['Reservations']
+        if ins:
+            targets = []
+            for res in ins:
+                targets.append(res['Instances'][0]['InstanceId'])
+            for target_id in targets:
+                self.target_derigister(target_id)
+                self.terminate_instance(target_id)
 
     def delete_app_data_rds(self):
         db = engine.connect()
@@ -137,6 +151,11 @@ class EC2_Services:
         d = table.delete()
         db.execute(d)
         db.close()
+
+    def stop_manager(self):
+        self.terminate_all_instance()
+        manager_id = 'i-0350edfa61b87909e'
+        self.stop_instance(manager_id)
 
 
 
