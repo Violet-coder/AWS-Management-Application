@@ -1,0 +1,28 @@
+
+    <form action='{{url_for("ec2_list")}}' method='get'>
+        <input type='submit' value='Back' />
+    </form>
+
+
+
+
+    <h2>Number of Workers</h2>
+
+    <div id="worker_num_plot" style="width:300px;height:150px"></div>
+
+
+
+    <script>
+
+        var options = {
+            series: {
+                lines: { show: true },
+                points: { show: true }
+            }
+        };
+
+
+        $.plot($("#worker_num_plot"), [ {{ worker_num }} ] , options);
+
+
+    </script>

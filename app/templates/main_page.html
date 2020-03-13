@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Welcome Page</title>
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+<nav class="navbar navbar-dark bg-dark" role="navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">SystemControl</a>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar-inverse col-md-1 col-lg-2 ml-2" role="navigation">
+            <div class="navbar-header">
+                <a class="navbar-brand">MANAGE</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{{ url_for('ec2_list') }}">EC2</a></li>
+                    <li><a href="{{ url_for('s3_list') }}">S3</a></li>
+                    <li><a href="{{ url_for('get_autoscaling_policy_from_users') }}">Auto Scaling</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="col-md-9 text-center px-4 pt-2">
+            <h1>Welcome Manager!</h1>
+            <p class="lead text-muted">Severs can be added/removed manually or using auto scaling.</p>
+            <br><br><br>
+
+            <form action="{{url_for('stop_manager')}}" method="get">
+                <input class="btn btn-sm btn-primary display-4" type="submit" value="Stop Manager">
+            </form>
+
+            {% block content %}
+            <div class="container">
+                {% for message in get_flashed_messages() %}
+                    {{ message }}
+                {% endfor %}
+                {% block page_content %}{% endblock %}
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>
