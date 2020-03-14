@@ -90,7 +90,7 @@ class Autoscaling_Services:
             time.sleep(1)
             status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
         self.target_register(new_instance_id)
-        return [error, '']
+        return new_instance_id
 
     def get_available_target(self):
         available_instances_id = []
@@ -202,9 +202,8 @@ class Autoscaling_Services:
             running_instances = self.get_running_instances()['Reservations']
             if not running_instances:
                 logging.warning('{} no workers in the pool'.format(current_time))
-                self.grow_one_worker()
-                print("1111111111")
-                logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
+                new_instance_id = self.grow_one_worker()
+                logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
 
         if cpu_utils > threshold_growing:
             response = self.grow_worker_by_ratio(threshold_growing, ratio_growing)
