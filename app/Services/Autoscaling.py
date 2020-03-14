@@ -184,7 +184,7 @@ class Autoscaling_Services:
         ratio_shrinking = policy[4]
         current_time = datetime.now()
         instance_amount, cpu_utils, lasttime = self.get_cpu_utility()
-        print('instance amoiunt',instance_amount)
+        print('instance amount',instance_amount)
         logging.warning("Time is {}".format(lasttime))
         logging.warning("cpu_utils is {}".format(cpu_utils))
         logging.warning(
@@ -192,7 +192,7 @@ class Autoscaling_Services:
                                                                                                   threshold_shrinking,
                                                                                                   ratio_growing,
                                                                                                   ratio_shrinking))
-        if instance_amount == -1:
+        if instance_amount == 0:
             logging.warning('{} no workers in the pool'.format(current_time))
             self.grow_one_worker()
             logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
