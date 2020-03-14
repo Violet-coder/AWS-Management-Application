@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import math
 import time
 import logging
-import app.config
+#import app.config
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
 
