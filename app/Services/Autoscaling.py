@@ -11,7 +11,7 @@ from sqlalchemy import *
 
 
 
-ami_id = 'ami-06981bc111789bad7'
+ami_id = 'ami-03aa90d2b6dc596f4'
 zone = 'us-east-1a'
 key_name = 'ece1779_a1'
 security_group = ['sg-041902e4d97796241']
@@ -112,13 +112,13 @@ class Autoscaling_Services:
         s = select([table]).where(table.c.id == 1)
         cur = db.execute(s)
         item = cur.fetchone()
-        parameters = item
+        print(item)
         if item is None:
             i = table.insert()
             db.execute(i, threshold_growing="80", threshold_shrinking="20", ratio_growing="2", ratio_shrinking="2")
             db.close()
         else:
-            parameters = (1, 80, 20, 2.00, 2.00)
+            parameters = item
         return parameters
 
     def get_running_instances(self):
