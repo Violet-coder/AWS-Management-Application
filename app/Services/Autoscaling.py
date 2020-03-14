@@ -118,6 +118,11 @@ class Autoscaling_Services:
             parameters = (1, 80, 20, 2.00, 2.00)
         return parameters
 
+    def get_running_instances(self):
+        ec2_filter = [{'Name': 'tag:Name', 'Values': [ec2_name]},
+                      {'Name': 'instance-state-name', 'Values': ['running']}]
+        return self.EC2.describe_instances(Filters=ec2_filter)
+
     def get_using_target(self):
         available_instances_id = []
         target_group = self.ELB.describe_target_health(TargetGroupArn=targetgroup_ARN)
@@ -176,7 +181,7 @@ class Autoscaling_Services:
         self.EC2.stop_instances(InstanceIds=[instance_id], Hibernate=False, Force=False)
 
     def auto_scaling(self):
-        logging.warning('-----------auto_scaling------------')
+        logging.warning('-----------auto_scaling------------------------------------')
         policy = self.auto_scaling_policy()
         threshold_growing = policy[1]
         threshold_shrinking = policy[2]
@@ -194,8 +199,10 @@ class Autoscaling_Services:
                                                                                                   ratio_shrinking))
         if instance_amount == 0:
             logging.warning('{} no workers in the pool'.format(current_time))
-            self.grow_one_worker()
-            logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
+            running_instances=self.get_running_instances()['Reservations']
+            if running_instances:
+                self.grow_one_worker()
+                logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
 
         if cpu_utils > threshold_growing:
             response = self.grow_worker_by_ratio(threshold_growing, ratio_growing)
@@ -206,7 +213,7 @@ class Autoscaling_Services:
         else:
             logging.warning('{} nothing to change'.format(current_time))
 
-        logging.warning('----------------------------------')
+        logging.warning('-----------------------------------------------------------')
 
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
