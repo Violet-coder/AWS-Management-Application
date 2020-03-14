@@ -73,15 +73,16 @@ class Autoscaling_Services:
             print(instance['InstanceId'] + " created!")
         return response['Instances'][0]['InstanceId']
 
+    """"
     def grow_one_worker(self):
         #target_instance_id = self.get_available_target()
         error = False
-        stopped_instances = self.get_stopped_instances()['Reservations']
-        if stopped_instances:
-            new_instance_id = stopped_instances[0]['Instances'][0]['InstanceId']
-            self.start_instance(new_instance_id)
-        else:
-            new_instance_id = self.create_new_instance()
+        #stopped_instances = self.get_stopped_instances()['Reservations']
+        #if stopped_instances:
+        #   new_instance_id = stopped_instances[0]['Instances'][0]['InstanceId']
+        #   self.start_instance(new_instance_id)
+        #else:
+        new_instance_id = self.create_new_instance()
         status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
         while len(status['InstanceStatuses']) < 1:
             time.sleep(1)
@@ -90,7 +91,9 @@ class Autoscaling_Services:
             time.sleep(1)
             status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
         self.target_register(new_instance_id)
+        print("")
         return new_instance_id
+    """
 
     def get_available_target(self):
         available_instances_id = []
@@ -202,7 +205,15 @@ class Autoscaling_Services:
             running_instances = self.get_running_instances()['Reservations']
             if not running_instances:
                 logging.warning('{} no workers in the pool'.format(current_time))
-                new_instance_id = self.grow_one_worker()
+                new_instance_id = self.create_new_instance()
+                status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
+                while len(status['InstanceStatuses']) < 1:
+                    time.sleep(1)
+                    status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
+                while status['InstanceStatuses'][0]['InstanceState']['Name'] != 'running':
+                    time.sleep(1)
+                    status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
+                self.target_register(new_instance_id)
                 logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
 
         if cpu_utils > threshold_growing:
