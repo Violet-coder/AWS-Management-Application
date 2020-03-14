@@ -58,8 +58,10 @@ def ec2_view(id):
         cpu_stats.append([time, point['Average']])
 
     cpu_stats = sorted(cpu_stats, key=itemgetter(0))
-    return render_template("EC2_view.html", title="Instance Info", instance=instance, cpu_stats=cpu_stats)
 
+    graph_address = 'https://users12.s3.amazonaws.com/http/' + str(id) + '.jpg'
+
+    return render_template("EC2_view.html", title="Instance Info", instance=instance, cpu_stats=cpu_stats,graph_adress=graph_address)
 
 @webapp.route('/ec2_examples/grow', methods=['POST'])
 # Start a new EC2 instance
@@ -156,7 +158,7 @@ def delete_s3():
 
 
 
-@webapp.route('/autoscaling/',methods=['GET','POST'])
+@webapp.route('/autoscaling/',methods=['GET', 'POST'])
 def get_autoscaling_policy_from_users():
     if request.method == "POST":
         print("+++++++")
@@ -165,15 +167,15 @@ def get_autoscaling_policy_from_users():
         autoscaling.threshold_shrinking = request.form['threshold_shrinking']
         autoscaling.ratio_growing = request.form['ratio_growing']
         autoscaling.ratio_shrinking = request.form['ratio_shrinking']
-        insert_autoscaling_policy_to_db(autoscaling)
+        update_autoscaling_policy_to_db(autoscaling)
         print(autoscaling.threshold_growing)
     return render_template('auto_scaling.html')
 
-def insert_autoscaling_policy_to_db(autoscaling):
+def update_autoscaling_policy_to_db(autoscaling):
     db = engine.connect()
     metadata = MetaData(db)
     table = Table('autoscaling', metadata, autoload=True)
-    i = table.insert()
-    db.execute(i, threshold_growing=autoscaling.threshold_growing, threshold_shrinking=autoscaling.threshold_shrinking, ratio_growing=autoscaling.ratio_growing,
-               ratio_shrinking=autoscaling.ratio_shrinking)
+    u = table.update().values(threshold_growing=autoscaling.threshold_growing,threshold_shrinking=autoscaling.threshold_shrinking,
+                              ratio_growing=autoscaling.ratio_growing,ratio_shrinking=autoscaling.ratio_shrinking).where(table.c.id ==1)
+    db.execute(u)
     db.close()
