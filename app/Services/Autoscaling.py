@@ -203,6 +203,7 @@ class Autoscaling_Services:
             if not running_instances:
                 logging.warning('{} no workers in the pool'.format(current_time))
                 self.grow_one_worker()
+                print("1111111111")
                 logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
 
         if cpu_utils > threshold_growing:
