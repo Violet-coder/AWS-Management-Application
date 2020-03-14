@@ -184,8 +184,8 @@ class Autoscaling_Services:
         ratio_shrinking = policy[4]
         current_time = datetime.now()
         instance_amount, cpu_utils, lasttime = self.get_cpu_utility()
-        print('instance amount',instance_amount)
         logging.warning("Time is {}".format(lasttime))
+        logging.warning("instance amount is {}".format(instance_amount))
         logging.warning("cpu_utils is {}".format(cpu_utils))
         logging.warning(
             "threshold_growing:{0}, shrinking:{1}, ratio growing:{2}, ratio shrinking:{3}".format(threshold_growing,
@@ -205,6 +205,9 @@ class Autoscaling_Services:
             logging.warning('{} shrink workers: {}'.format(current_time, response))
         else:
             logging.warning('{} nothing to change'.format(current_time))
+
+        logging.warning('----------------------------------')
+
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
         instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
