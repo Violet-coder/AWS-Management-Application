@@ -16,6 +16,7 @@
                 <tr><td>Public IP Address</td><td>{{ instance.public_ip_address }}</td></tr>
                 <tr><td>State</td><td>{{ instance.state['Name'] }}</td></tr>
             </table>
+
             <h3>CPU</h3>
 
                 <div id="cpu_stats_plot" style="width:300px;height:150px"></div>
@@ -36,9 +37,8 @@
             </script>
 
             <h3>HTTP Request</h3>
-                <div style="width:300px;height:150px">
-                    <img src={{ graph_address }}>
-                </div>
+                <img src={{graph_address}} alt='http' style="width:600px;height:300px;">
+
 
             <form action='{{url_for("ec2_list")}}' method='get'>
                 <input type='submit' value='Back' />

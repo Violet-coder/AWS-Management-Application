@@ -1,36 +1,30 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <title>Auto Scaling</title>
     <link href="../static/bootstrap.min.css" rel="stylesheet">
-    <title>EC2</title>
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/bootstrap/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/bootstrap/main.css">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark" role="navigation">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">SystemControl</a>
-        <ul class="nav navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="main_page.html">Return</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+    <nav class="navbar navbar-dark bg-dark" role="navigation">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">SystemControl</a>
+            <ul class="navbar-brand">
+                <a href="{{ url_for('ec2_list') }}">EC2</a>
+            </ul>
+            <ul class="navbar-brand">
+                <a href="{{ url_for('s3_list') }}">S3</a>
+            </ul>
 
-<div class="container-fluid">
-    <div class="row">
-        <nav class="navbar-inverse col-md-1 col-lg-2 ml-2" role="navigation">
-            <div class="navbar-header">
-                <a class="navbar-brand">MANAGE</a>
-            </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="{{ url_for('ec2_list') }}">EC2</a></li>
-                    <li><a href="{{ url_for('s3_list') }}">S3</a></li>
-                    <li><a href="{{ url_for('get_autoscaling_policy_from_users') }}">Auto Scaling</a></li>
-                </ul>
-            </div>
-        </nav>
+            <ul class="navbar-brand">
+                <a href="{{ url_for('get_autoscaling_policy_from_users') }}">Auto Scaling</a>
+            </ul>
+        </div>
+    </nav>
+
         <main role="main" class="col-md-9 pt-3 px-4">
             <h2>INSTANCES</h2>
             <div class="table-responsive">
@@ -59,7 +53,7 @@
                             </td>
                             <td>
                                 <form action="{{url_for('ec2_destroy',id=instance.id)}}" method='post' onsubmit='return confirm("Are you sure?")'>
-                                    <input class="btn btn-sm btn-primary display-4" type='submit' value='Destroy' />
+                                    <input class="btn btn-sm btn-primary display-4" type='submit' value='Destroy'/>
                                 </form>
                             </td>
                         </tr>
@@ -83,10 +77,16 @@
                 </tr>
             </tbody>
         </table>
+        <br>
+        <form action="{{url_for('get_chart_numofworkers')}}" method="post">
+            <input class="btn btn-sm btn-primary display-4" type="submit" value="Workers">
+        </form>
+
+        <br>
+        <h3>Load Balancer DNS:</h3>
+        <a href="http://loadbalancer1-847641212.us-east-1.elb.amazonaws.com:5000/ ">http://loadbalancer1-847641212.us-east-1.elb.amazonaws.com</a >
 
 
         </main>
-    </div>
-</div>
 </body>
 </html>
