@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import math
 import time
 import logging
+import app.Services.model
 #import app.config
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
@@ -187,6 +188,7 @@ class Autoscaling_Services:
     def auto_scaling(self):
         logging.warning('-----------auto_scaling------------------------------------')
         policy = self.auto_scaling_policy()
+        print(policy)
         threshold_growing = policy[1]
         threshold_shrinking = policy[2]
         ratio_growing = policy[3]
