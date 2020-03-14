@@ -122,7 +122,7 @@ class Autoscaling_Services:
         ec2_filter = [{'Name': 'tag:Name', 'Values': [ec2_name]},
                       {'Name': 'instance-state-name', 'Values': ['running']}]
         return self.EC2.describe_instances(Filters=ec2_filter)
-
+    """"
     def get_using_target(self):
         available_instances_id = []
         target_group = self.ELB.describe_target_health(TargetGroupArn=targetgroup_ARN)
@@ -131,6 +131,7 @@ class Autoscaling_Services:
                 if target['TargetHealth']['State'] != 'unhealthy':
                     available_instances_id.append(target['Target']['Id'])
         return available_instances_id
+    """
 
     def get_cpu_utility(self):
         valid_targets = self.ELB.describe_target_health(TargetGroupArn=targetgroup_ARN)[
@@ -198,9 +199,9 @@ class Autoscaling_Services:
                                                                                                   ratio_growing,
                                                                                                   ratio_shrinking))
         if instance_amount == 0:
-            logging.warning('{} no workers in the pool'.format(current_time))
-            running_instances=self.get_running_instances()['Reservations']
-            if running_instances:
+            running_instances = self.get_running_instances()['Reservations']
+            if not running_instances:
+                logging.warning('{} no workers in the pool'.format(current_time))
                 self.grow_one_worker()
                 logging.warning('{} Create a worker if there is no worker in the pool now'.format(current_time))
 
