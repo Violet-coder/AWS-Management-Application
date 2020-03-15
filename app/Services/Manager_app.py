@@ -161,14 +161,12 @@ def delete_s3():
 @webapp.route('/autoscaling/',methods=['GET', 'POST'])
 def get_autoscaling_policy_from_users():
     if request.method == "POST":
-        print("+++++++")
         autoscaling=Autoscaling()
         autoscaling.threshold_growing = request.form['threshold_growing']
         autoscaling.threshold_shrinking = request.form['threshold_shrinking']
         autoscaling.ratio_growing = request.form['ratio_growing']
         autoscaling.ratio_shrinking = request.form['ratio_shrinking']
         update_autoscaling_policy_to_db(autoscaling)
-        print(autoscaling.threshold_growing)
     return render_template('auto_scaling.html')
 
 def update_autoscaling_policy_to_db(autoscaling):
