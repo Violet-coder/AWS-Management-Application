@@ -197,9 +197,10 @@ class Autoscaling_Services:
                                                                                                   ratio_growing,
                                                                                                   ratio_shrinking))
         if instance_amount == 0:
-            new_instance_id=self.grow_one_worker()
-            logging.warning(
-                '{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
+            running_instances = self.get_running_instances()['Reservations']
+            if not running_instances:
+                new_instance_id=self.grow_one_worker()
+                logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
             """
             running_instances = self.get_running_instances()['Reservations']
             if not running_instances:
