@@ -108,7 +108,7 @@ class Autoscaling_Services:
         item = cur.fetchone()
         if item is None:
             i = table.insert()
-            db.execute(i, threshold_growing="80", threshold_shrinking="20", ratio_growing="2", ratio_shrinking="2")
+            db.execute(i, threshold_growing="80", threshold_shrinking="20", ratio_growing="2", ratio_shrinking="0.5")
             db.close()
         else:
             parameters = item
@@ -229,9 +229,11 @@ class Autoscaling_Services:
 
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
-        instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+        ins_amount, current_cpu_util, lasttime = self.get_cpu_utility()
         instance_list = []
         # worker_management = EC2_Services()
+        running_instances = self.get_running_instances()['Reservations']
+        instance_amount = len(running_instances)
         if current_cpu_util > threshold_growing:
             if instance_amount < 10:
                 instance_needs_to_start = math.floor(instance_amount * ratio_growing - instance_amount)
@@ -286,15 +288,16 @@ class Autoscaling_Services:
         return instance_list
 
     def shrink_worker_by_ratio(self, threshold_shrinking, ratio_shrinking):
-        instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
-        current_amount = instance_amount
-        # worker_management = EC2_Services()
+        ins_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+       #worker_management = EC2_Services()
         target_instance_id = self.get_available_target()
         running_instances = target_instance_id
+        instance_amount = len(running_instances)
+        current_amount = instance_amount
         instance_list = []
         if current_cpu_util < threshold_shrinking:
             if instance_amount > 1:
-                instance_needs_to_stop = math.ceil(instance_amount / ratio_shrinking)
+                instance_needs_to_stop = math.ceil(instance_amount - instance_amount * ratio_shrinking)
                 for i in range(instance_needs_to_stop):
                     if (current_amount < 2):
                         break
