@@ -188,8 +188,11 @@ class Autoscaling_Services:
         ratio_shrinking = policy[4]
         current_time = datetime.now()
         instance_amount, cpu_utils, lasttime = self.get_cpu_utility()
+        running_instances = self.get_running_instances()['Reservations']
+        running_instance_amount = len(running_instances)
         logging.warning("Time is {}".format(lasttime))
         logging.warning("instance amount is {}".format(instance_amount))
+        logging.warning("Running instance amount is {}".format(running_instance_amount))
         logging.warning("cpu_utils is {}".format(cpu_utils))
         logging.warning(
             "threshold_growing:{0}, shrinking:{1}, ratio growing:{2}, ratio shrinking:{3}".format(threshold_growing,
@@ -230,11 +233,11 @@ class Autoscaling_Services:
 
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
-        ins_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+        instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
         instance_list = []
         # worker_management = EC2_Services()
-        running_instances = self.get_running_instances()['Reservations']
-        instance_amount = len(running_instances)
+        #running_instances = self.get_running_instances()['Reservations']
+        #instance_amount = len(running_instances)
         if current_cpu_util > threshold_growing:
             if instance_amount < 10:
                 instance_needs_to_start = math.floor(instance_amount * ratio_growing - instance_amount)
