@@ -193,7 +193,8 @@ class Autoscaling_Services:
         cpu_utils = cpu_sum / new_instance_amount
 
         logging.warning("Time is {}".format(lasttime))
-        logging.warning("instance amount is {}".format(instance_amount))
+        logging.warning("Instance has cpu amount is {}".format(instance_amount))
+        logging.warning("Instance in the target group(except draining) is {}".format(new_instance_amount))
         logging.warning("Running instance amount is {}".format(running_instance_amount))
         logging.warning("cpu_utils is {}".format(cpu_utils))
         logging.warning(
@@ -241,12 +242,12 @@ class Autoscaling_Services:
         new_instance_amount = len(self.get_available_target())
         current_cpu_util = cpu_sum / new_instance_amount
         if instance_amount * ratio_growing > new_instance_amount and current_cpu_util > threshold_growing:
-            if new_instance_amount <= 10:
+            if new_instance_amount < 8:
                 instance_needs_to_start = math.floor(instance_amount * ratio_growing - new_instance_amount)
                 temp_num_of_instances = new_instance_amount + instance_needs_to_start
 
-                if (temp_num_of_instances > 10):
-                    instance_needs_to_start = instance_needs_to_start - (temp_num_of_instances - 10)
+                if (temp_num_of_instances > 8):
+                    instance_needs_to_start = instance_needs_to_start - (temp_num_of_instances - 8)
 
                 print('instance_needs_to_start:', instance_needs_to_start)
                 error = False
@@ -304,9 +305,9 @@ class Autoscaling_Services:
         instance_list = []
         new_instance_amount = current_amount
         current_cpu_util = cpu_sum / new_instance_amount
-        if current_cpu_util < threshold_shrinking:
-            if instance_amount > 1:
-                instance_needs_to_stop = math.ceil(instance_amount - instance_amount * ratio_shrinking)
+        if ins_amount*ratio_shrinking<new_instance_amount and current_cpu_util < threshold_shrinking:
+            if new_instance_amount > 1:
+                instance_needs_to_stop = math.ceil(new_instance_amount - ins_amount * ratio_shrinking)
                 for i in range(instance_needs_to_stop):
                     if (current_amount < 2):
                         break
