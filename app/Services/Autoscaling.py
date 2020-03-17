@@ -159,9 +159,9 @@ class Autoscaling_Services:
             except IndexError:
                 pass
 
-        cpu_sum_avg = cpu_sum / cpu_count if cpu_count else -1
+        #cpu_sum_avg = cpu_sum / cpu_count if cpu_count else -1
 
-        return cpu_count, cpu_sum_avg, lasttime
+        return cpu_count, cpu_sum, lasttime
 
     def target_register(self, instance_id):
         self.ELB.register_targets(
@@ -181,15 +181,17 @@ class Autoscaling_Services:
     def auto_scaling(self):
         logging.warning('-----------auto_scaling------------------------------------')
         policy = self.auto_scaling_policy()
-        print(policy)
         threshold_growing = policy[1]
         threshold_shrinking = policy[2]
         ratio_growing = policy[3]
         ratio_shrinking = policy[4]
         current_time = datetime.now()
-        instance_amount, cpu_utils, lasttime = self.get_cpu_utility()
+        instance_amount, cpu_sum, lasttime = self.get_cpu_utility()
         running_instances = self.get_running_instances()['Reservations']
         running_instance_amount = len(running_instances)
+        new_instance_amount = len(self.get_available_target())
+        cpu_utils = cpu_sum / new_instance_amount
+
         logging.warning("Time is {}".format(lasttime))
         logging.warning("instance amount is {}".format(instance_amount))
         logging.warning("Running instance amount is {}".format(running_instance_amount))
@@ -199,6 +201,7 @@ class Autoscaling_Services:
                                                                                                   threshold_shrinking,
                                                                                                   ratio_growing,
                                                                                                   ratio_shrinking))
+
         if instance_amount == 0:
             running_instances = self.get_running_instances()['Reservations']
             if not running_instances:
@@ -220,7 +223,7 @@ class Autoscaling_Services:
                 logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
             """
 
-        if cpu_utils > threshold_growing:
+        if  cpu_utils > threshold_growing:
             response = self.grow_worker_by_ratio(threshold_growing, ratio_growing)
             logging.warning('{} grow workers: {}'.format(current_time, response))
         elif cpu_utils < threshold_shrinking:
@@ -233,15 +236,15 @@ class Autoscaling_Services:
 
 
     def grow_worker_by_ratio(self, threshold_growing, ratio_growing):
-        instance_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+        instance_amount, cpu_sum, lasttime = self.get_cpu_utility()
         instance_list = []
-        # worker_management = EC2_Services()
-        #running_instances = self.get_running_instances()['Reservations']
-        #instance_amount = len(running_instances)
-        if current_cpu_util > threshold_growing:
-            if instance_amount < 10:
-                instance_needs_to_start = math.floor(instance_amount * ratio_growing - instance_amount)
-                temp_num_of_instances = instance_amount + instance_needs_to_start
+        new_instance_amount = len(self.get_available_target())
+        current_cpu_util = cpu_sum / new_instance_amount
+        if instance_amount * ratio_growing > new_instance_amount and current_cpu_util > threshold_growing:
+            if new_instance_amount <= 10:
+                instance_needs_to_start = math.floor(instance_amount * ratio_growing - new_instance_amount)
+                temp_num_of_instances = new_instance_amount + instance_needs_to_start
+
                 if (temp_num_of_instances > 10):
                     instance_needs_to_start = instance_needs_to_start - (temp_num_of_instances - 10)
 
@@ -292,13 +295,15 @@ class Autoscaling_Services:
         return instance_list
 
     def shrink_worker_by_ratio(self, threshold_shrinking, ratio_shrinking):
-        ins_amount, current_cpu_util, lasttime = self.get_cpu_utility()
+        ins_amount, cpu_sum, lasttime = self.get_cpu_utility()
        #worker_management = EC2_Services()
         target_instance_id = self.get_available_target()
         running_instances = target_instance_id
         instance_amount = len(running_instances)
         current_amount = instance_amount
         instance_list = []
+        new_instance_amount = current_amount
+        current_cpu_util = cpu_sum / new_instance_amount
         if current_cpu_util < threshold_shrinking:
             if instance_amount > 1:
                 instance_needs_to_stop = math.ceil(instance_amount - instance_amount * ratio_shrinking)

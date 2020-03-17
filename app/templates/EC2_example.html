@@ -13,6 +13,9 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="#">SystemControl</a>
             <ul class="navbar-brand">
+                <a href="{{ url_for('mainpage') }}">Main</a>
+            </ul>
+            <ul class="navbar-brand">
                 <a href="{{ url_for('ec2_list') }}">EC2</a>
             </ul>
             <ul class="navbar-brand">
@@ -25,7 +28,7 @@
         </div>
     </nav>
 
-        <main role="main" class="col-md-9 pt-3 px-4">
+        <main role="main" class="col-md-12 pt-3 px-4">
             <h2>INSTANCES</h2>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">

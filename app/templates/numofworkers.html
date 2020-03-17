@@ -1,13 +1,12 @@
-{% extends "base.html" %}
-{% block content %}
-
-    <form action='{{url_for("ec2_list")}}' method='get'>
-        <input type='submit' value='Back' />
-    </form>
-
-
-
-
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="{{ url_for('static', filename='flot/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='flot/jquery.flot.js') }}"></script>
+</head>
+<body>
     <h2>Number of Workers</h2>
 
     <div id="worker_num_plot" style="width:300px;height:150px"></div>
@@ -28,4 +27,9 @@
 
 
     </script>
-{% endblock %}
+
+    <form action='{{url_for("ec2_list")}}' method='get'>
+        <input class="btn btn-sm btn-primary display-4" type='submit' value='Back' />
+    </form>
+</body>
+</html>

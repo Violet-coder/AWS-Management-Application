@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <link href="../static/bootstrap.min.css" rel="stylesheet">
-    <title>EC2</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='flot/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='flot/jquery.flot.js') }}"></script>
 </head>
+
+<body>
 
 <div class="container align-center">
     <div class="row justify-content-md-center">
@@ -42,7 +45,7 @@
 
 
             <form action='{{url_for("ec2_list")}}' method='get'>
-                <input type='submit' value='Back' />
+                <input class="btn btn-sm btn-primary display-4" type='submit' value='Back' />
             </form>
 
         </div>
