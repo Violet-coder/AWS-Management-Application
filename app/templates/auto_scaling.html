@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Auto Scaling</title>
     <link href="../static/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../static/bootstrap/bootstrap.min.css">
@@ -36,15 +37,15 @@
 
 				<form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-43">
-						Autoscaling
+						Auto scaling
 					</span>
 
 
-                    <div class="wrap-input100 validate-input" data-validate = "threshold_growing is required">
-                        <input class="input100" type="text" name="threshold_growing" method="post">
-                        <span class="focus-input100"></span>
-                        <span class="label-input100">threshold_growing</span>
-                    </div>
+                                <div class="wrap-input100 validate-input" data-validate = "threshold_growing is required">
+                                    <input class="input100" type="text" name="threshold_growing" method="post">
+                                    <span class="focus-input100"></span>
+                                    <span class="label-input100">threshold_growing</span>
+                                </div>
 
                                 <div class="wrap-input100 validate-input" data-validate = "threshold_shrinking is required">
 
@@ -81,5 +82,8 @@
 			</div>
 		</div>
     </div>
+	<script src="../../app/static/bootstrap/jquery.min.js"></script>
+	<script src="../../app/static/bootstrap/bootstrap.min.js"></script>
+	<script src="../../app/static/bootstrap/main.js"></script>
 </body>
 </html>

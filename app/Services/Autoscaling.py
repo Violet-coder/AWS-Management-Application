@@ -153,9 +153,11 @@ class Autoscaling_Services:
                 Period=60,  # Data points with a period of 60 seconds (1-minute) are available for 15 days.
             )
             try:
+                if response["Datapoints"][0]["Average"]:
+                    cpu_count = cpu_count + 1
                 lasttime = response["Datapoints"][0]["Timestamp"]
                 cpu_sum += response["Datapoints"][0]["Average"]
-                cpu_count = cpu_count + 1
+
             except IndexError:
                 pass
 
@@ -187,43 +189,28 @@ class Autoscaling_Services:
         ratio_shrinking = policy[4]
         current_time = datetime.now()
         instance_amount, cpu_sum, lasttime = self.get_cpu_utility()
+        if len(self.get_available_target()) == 0:
+            running_instances = self.get_running_instances()['Reservations']
+            if not running_instances:
+                new_instance_id=self.grow_one_worker()
+                logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
         running_instances = self.get_running_instances()['Reservations']
         running_instance_amount = len(running_instances)
         new_instance_amount = len(self.get_available_target())
-        cpu_utils = cpu_sum / new_instance_amount
 
         logging.warning("Time is {}".format(lasttime))
         logging.warning("Instance has cpu amount is {}".format(instance_amount))
         logging.warning("Instance in the target group(except draining) is {}".format(new_instance_amount))
         logging.warning("Running instance amount is {}".format(running_instance_amount))
-        logging.warning("cpu_utils is {}".format(cpu_utils))
         logging.warning(
             "threshold_growing:{0}, shrinking:{1}, ratio growing:{2}, ratio shrinking:{3}".format(threshold_growing,
                                                                                                   threshold_shrinking,
                                                                                                   ratio_growing,
                                                                                                   ratio_shrinking))
 
-        if instance_amount == 0:
-            running_instances = self.get_running_instances()['Reservations']
-            if not running_instances:
-                new_instance_id=self.grow_one_worker()
-                logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
-            """
-            running_instances = self.get_running_instances()['Reservations']
-            if not running_instances:
-                logging.warning('{} no workers in the pool'.format(current_time))
-                new_instance_id = self.create_new_instance()
-                status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
-                while len(status['InstanceStatuses']) < 1:
-                    time.sleep(1)
-                    status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
-                while status['InstanceStatuses'][0]['InstanceState']['Name'] != 'running':
-                    time.sleep(1)
-                    status = self.EC2.describe_instance_status(InstanceIds=[new_instance_id])
-                self.target_register(new_instance_id)
-                logging.warning('{} Create a worker {} if there is no worker in the pool now'.format(current_time, new_instance_id))
-            """
 
+        cpu_utils = cpu_sum / new_instance_amount
+        logging.warning("cpu_utils is {}".format(cpu_utils))
         if  cpu_utils > threshold_growing:
             response = self.grow_worker_by_ratio(threshold_growing, ratio_growing)
             logging.warning('{} grow workers: {}'.format(current_time, response))
@@ -311,7 +298,8 @@ class Autoscaling_Services:
                 for i in range(instance_needs_to_stop):
                     if (current_amount < 2):
                         break
-                    if (running_instances[i] != 'i-0350edfa61b87909e'):  # do not stop instance for a2
+                    #if (running_instances[i] != 'i-0350edfa61b87909e'):  # do not stop instance for a2
+                    else:
                         self.target_derigister(running_instances[i])
                         self.stop_instance(running_instances[i])
                         current_amount = current_amount - 1
