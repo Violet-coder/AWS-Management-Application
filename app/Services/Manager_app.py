@@ -41,7 +41,7 @@ def ec2_view(id):
 
     cpu = client.get_metric_statistics(
         Period=1 * 60,
-        StartTime=datetime.utcnow() - timedelta(seconds=60 * 60),
+        StartTime=datetime.utcnow() - timedelta(seconds=30 * 60),
         EndTime=datetime.utcnow() - timedelta(seconds=0 * 60),
         MetricName=metric_name,
         Namespace=namespace,  # Unit='Percent',
