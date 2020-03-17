@@ -8,7 +8,7 @@ from sqlalchemy import *
 
 
 
-ami_id = 'ami-03677630d604d21b1'
+ami_id = 'ami-06be66856b59a7aaa'
 zone = 'us-east-1a'
 key_name = 'ece1779_a1'
 security_group = ['sg-041902e4d97796241']
