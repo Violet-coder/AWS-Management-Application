@@ -3,7 +3,6 @@ from app import webapp
 from datetime import datetime, timedelta
 from operator import itemgetter
 from app.Services.EC2 import *
-from app.Services.Autoscaling import Autoscaling_Services
 from sqlalchemy import *
 from app.Services.model import Autoscaling
 
