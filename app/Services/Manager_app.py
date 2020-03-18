@@ -152,7 +152,7 @@ def delete_s3():
     my_bucket.objects.filter(Prefix='user_photo').delete()
     my_bucket.objects.filter(Prefix='http').delete()
     worker_management.delete_app_data_rds()
-    flash('successfully!')
+    flash('You have cleared application data successfully!')
     return render_template("main_page.html")
 
 
