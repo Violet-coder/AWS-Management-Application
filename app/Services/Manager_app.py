@@ -13,6 +13,7 @@ engine = create_engine('mysql+pymysql://ece1779db:ece1779db@ece1779db.cj2g85prhc
 def stop_manager():
     worker_management = EC2_Services()
     worker_management.stop_manager()
+    flash('The manager app has been stopped.Thank you for using!')
     return render_template("main_page.html")
 
 @webapp.route('/', methods=['GET', 'POST'])
