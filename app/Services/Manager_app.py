@@ -87,6 +87,8 @@ def worker_shrink():
 @webapp.route('/ec2_examples/delete/<id>', methods=['POST'])
 # Terminate a EC2 instance
 def ec2_destroy(id):
+    worker_management = EC2_Services()
+    worker_management.target_derigister(id)
     # create connection to ec2
     ec2 = boto3.resource('ec2')
     ec2.instances.filter(InstanceIds=[id]).terminate()
@@ -176,3 +178,4 @@ def update_autoscaling_policy_to_db(autoscaling):
                               ratio_growing=autoscaling.ratio_growing,ratio_shrinking=autoscaling.ratio_shrinking).where(table.c.id ==1)
     db.execute(u)
     db.close()
+
