@@ -11,20 +11,20 @@
 <body>
     <nav class="navbar navbar-dark bg-dark" role="navigation">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">SystemControl</a>
+            <a class="navbar-brand" href="#" >SystemControl</a>
             <ul class="navbar-brand">
-                <a href="{{ url_for('ec2_list') }}">EC2</a>
+                <a href="{{ url_for('ec2_list') }}" style="color: #e3f2fd;">EC2</a>
             </ul>
             <ul class="navbar-brand">
-                <a href="{{ url_for('s3_list') }}">S3</a>
+                <a href="{{ url_for('s3_list') }}" style="color: #e3f2fd;">S3</a>
             </ul>
 
             <ul class="navbar-brand">
-                <a href="{{ url_for('get_autoscaling_policy_from_users') }}">Auto Scaling</a>
+                <a href="{{ url_for('get_autoscaling_policy_from_users') }}" style="color: #e3f2fd;">Auto Scaling</a>
             </ul>
         </div>
     </nav>
-
+        <div style=" height:200px; width:100%;"></div>
         <div class="col-md-12 text-center px-4 pt-2">
             <br>
             <h1>Welcome Manager!</h1>
